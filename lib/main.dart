@@ -7,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -112,14 +113,16 @@ class Connexion extends State<MyApp> {
 }
 
 class Articles extends StatelessWidget {
+  // const Article ({Key? key}) : super(key: key);
+
   String value = '';
   String? IdArticle = '';
   String? Nom = '';
   String? TypeArticle = '';
   String? UniteGestion = '';
-  String? QuantiteArticle = '';
+  int? QuantiteArticle;
   String? PrixUnitaire = '';
-  String? Date = '';
+  int? Date;
   final ReferenceDatabase = FirebaseFirestore.instance;
   final IdArticleController = TextEditingController();
   final NomController = TextEditingController();
@@ -128,9 +131,6 @@ class Articles extends StatelessWidget {
   final QuantiteArticleController = TextEditingController();
   final PrixUnitaireController = TextEditingController();
   final DateController = TextEditingController();
-  //final String? fullName;
-  //final String? company;
-  //final int? age;
   @override
   Widget build(BuildContext context) {
     // Create a CollectionReference called users that references the firestore collection
@@ -301,6 +301,7 @@ class MyHomePage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => Stock()),
+                    //builder: (context) => Articles()),
                   );
                 },
               )
@@ -489,45 +490,17 @@ class Ecran1 extends StatelessWidget {
     );
   }
 }
-
-class Stock extends StatelessWidget {
-  final String? Id;
-  Stock({this.Id});
-  @override
-  Widget build(BuildContext context) {
-    CollectionReference Articles =
-        FirebaseFirestore.instance.collection('Articles');
-    return FutureBuilder<DocumentSnapshot>(
-      future: Articles.doc(Id).get(),
-      builder:
-          (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-        if (snapshot.hasError) {
-          return Text("Erreur");
-        }
-        if (snapshot.hasData && !snapshot.data!.exists) {
-          return Text("Le document n'existe pas");
-        }
-        if (snapshot.connectionState == ConnectionState.done) {
-          Map<String, dynamic> data =
-              snapshot.data!.data() as Map<String, dynamic>;
-          return Text(
-              "STOCK: ${data['IdArticle']} ${data['Nom']} ${data['TypeArticle']}  ${data['UniteGestion']}  ${data['QuantiteArticle ']} ${data['PrixUnitaire']} ${data['Date']}");
-        }
-        return Text("Chargement");
-      },
-    );
-  }
-}
-//COMPTEUR//
 /*
+//COMPTEUR//
+
 // counters/${ID}
 class Counter {
-  final int numShards;
+  final int QuantiteArticle;
 
-  Counter(this.numShards);
+  Counter(this.QuantiteArticle);
 }
 
-// counters/${ID}/shards/${NUM}
+// counters/${ID}/Articles/${NUM}
 class Shard {
   final int count;
 
@@ -535,15 +508,15 @@ class Shard {
 }
 //Le code suivant initialise un compteur distribué
 
-Future<void> createCounter(DocumentReference ref, int numShards) async {
+Future<void> createCounter(DocumentReference ref, int QuantiteArticle) async {
   WriteBatch batch = FirebaseFirestore.instance.batch();
 
   // Initialize the counter document
-  batch.set(ref, {'numShards': numShards});
+  batch.set(ref, {'QuantiteArticle': QuantiteArticle});
 
   // Initialize each shard with count=0
-  for (var i = 0; i < numShards; i++) {
-    final shardRef = ref.collection('shards').doc(i.toString());
+  for (var i = 0; i < QuantiteArticle; i++) {
+    final shardRef = ref.collection('Articles').doc(i.toString());
     batch.set(shardRef, {'count': 0});
   }
 
@@ -552,11 +525,11 @@ Future<void> createCounter(DocumentReference ref, int numShards) async {
 }
 //Pour incrémenter le compteur, choisissez un fragment aléatoire et incrémentez le nombre :
 
-Future<void> incrementCounter(DocumentReference ref, int numShards) async {
+Future<void> incrementCounter(DocumentReference ref, int QuantiteArticle) async {
   // Select a shard of the counter at random
 
-  final shardId = Random().nextInt(numShards).toString();
-  final shardRef = ref.collection('shards').doc(shardId);
+  final shardId = Random().nextInt(QuantiteArticle).toString();
+  final shardRef = ref.collection('Articles').doc(shardId);
 
   // Update count
   await shardRef.update({'count': FieldValue.increment(1)});
@@ -565,11 +538,11 @@ Future<void> incrementCounter(DocumentReference ref, int numShards) async {
 
 Future<int> getCount(DocumentReference ref) async {
   // Sum the count of each shard in the subcollection
-  final shards = await ref.collection('shards').get();
+  final Articles = await ref.collection('Articles').get();
 
   int totalCount = 0;
 
-  shards.docs.forEach(
+  Articles.docs.forEach(
     (doc) {
       totalCount += doc.data()['count'] as int;
     },
@@ -578,3 +551,90 @@ Future<int> getCount(DocumentReference ref) async {
   return totalCount;
 }
 */
+
+class Stock extends StatefulWidget {
+  const Stock({Key? key}) : super(key: key);
+  @override
+  RetourStockState createState() => RetourStockState();
+}
+
+class RetourStockState extends State<Stock> {
+  final Stream<QuerySnapshot> Afficher =
+      FirebaseFirestore.instance.collection('Articles').snapshots();
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: Afficher,
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return const Text('Erreur');
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: Text("Chargement"),
+          );
+        }
+
+        return Column(
+          children: snapshot.data!.docs.map((DocumentSnapshot document) {
+            Map<String, dynamic> value =
+                document.data()! as Map<String, dynamic>;
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                children: [
+                  SizedBox(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            value['IdArticle'].toString(),
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ), /*
+                          Text(
+                            value['Nom'].toString(),
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            value['TypeArticle'].toString(),
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            value['UniteGestion'].toString(),
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            value['QuantiteArticle'].toString(),
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            value['PrixUnitaire'].toString(),
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            value['Date'].toString(),
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),*/
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+}
