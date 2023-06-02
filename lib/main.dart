@@ -10,11 +10,13 @@ import 'firebase_options.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 Future<void> main() async {
+  //Initialisation de Firebase
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(MaterialApp(home: MyApp()));
 }
 
+//Thème pour l'application
 class Themes {
   final ThemeData theme1 = ThemeData(
     primaryColor: Color(0xFFee6a59),
@@ -29,24 +31,26 @@ class Themes {
   );
 }
 
+//Classe principal(Widget)
 class MyApp extends StatefulWidget {
   @override
   Connexion createState() => Connexion();
-  // Connexion createState() => Connexion();
 }
 
+//Widget Connexion
 class Connexion extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return MaterialApp(
       theme: Themes().theme1,
+      //Zone de recherche
       title: "Connexion",
       home: Scaffold(
         appBar: AppBar(
+          //Nom de la page
           title: Text("G_COMMERCE"),
         ),
-        // return Scaffold(
+        //Vue un seul Widget
         body: SingleChildScrollView(
             child: Padding(
           padding: EdgeInsets.all(30),
@@ -59,7 +63,7 @@ class Connexion extends State<MyApp> {
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 15),
                 child: TextField(
-                  decoration: InputDecoration(hintText: "Username"),
+                  decoration: InputDecoration(hintText: "Articlesname"),
                 ),
               ),
               Padding(
@@ -70,17 +74,13 @@ class Connexion extends State<MyApp> {
                 ),
               ),
               ElevatedButton(
-                // onPressed: boutonLoginAppuyer,
+                // Text du button,
                 child: Text("Login"),
-                //onPressed: () => Navigator.pushNamed(context, FirstScreen()),
-                //onPressed: () => Navigator.pushNamed(context, "/"),
                 onPressed: () {
+                  // Action du button
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                        // builder: (context) => Home(),
-                        // builder: (context) => Interfaces(),
-                        // builder: (context) => Articles(),
                         builder: (context) => MyHomePage(),
                       ));
                 },
@@ -94,13 +94,8 @@ class Connexion extends State<MyApp> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          // builder: (context) => Home()//Exception on this line.
-                          //builder: (context) => Interfaces()
-                          //builder: (context) => Articles()
-                          builder: (context) => MyHomePage()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => MyHomePage()));
                 },
                 child: const Text("NEXT"),
               )
@@ -112,9 +107,9 @@ class Connexion extends State<MyApp> {
   }
 }
 
+// Widget Article
 class Articles extends StatelessWidget {
-  // const Article ({Key? key}) : super(key: key);
-
+  //Declaration des variables
   String value = '';
   String? IdArticle = '';
   String? Nom = '';
@@ -123,6 +118,7 @@ class Articles extends StatelessWidget {
   int? QuantiteArticle;
   String? PrixUnitaire = '';
   int? Date;
+  //Declaration des variables controleurs
   final ReferenceDatabase = FirebaseFirestore.instance;
   final IdArticleController = TextEditingController();
   final NomController = TextEditingController();
@@ -133,7 +129,7 @@ class Articles extends StatelessWidget {
   final DateController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    // Create a CollectionReference called users that references the firestore collection
+    // Créez une CollectionReference appelée Articles qui fait référence à la collection firestore
     CollectionReference Articles =
         FirebaseFirestore.instance.collection('Articles');
     home:
@@ -145,8 +141,8 @@ class Articles extends StatelessWidget {
           ),
           backgroundColor: Color(0xFFee6a59),
         ),
+        //Formulaire d'enregistrement des données
         body: Form(
-          // key: formkey,
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -166,6 +162,7 @@ class Articles extends StatelessWidget {
                       size: 25,
                     ),
                   ),
+                  //Affectation du controleur
                   controller: IdArticleController,
                 ),
                 TextFormField(
@@ -178,6 +175,7 @@ class Articles extends StatelessWidget {
                         size: 25,
                       ),
                     ),
+                    //Affectation du controleur
                     controller: NomController),
                 TextFormField(
                     decoration: InputDecoration(
@@ -189,6 +187,7 @@ class Articles extends StatelessWidget {
                         size: 25,
                       ),
                     ),
+                    //Affectation du controleur
                     controller: TypeArticleController),
                 TextFormField(
                     decoration: InputDecoration(
@@ -200,6 +199,7 @@ class Articles extends StatelessWidget {
                         size: 25,
                       ),
                     ),
+                    //Affectation du controleur
                     controller: UniteGestionController),
                 TextFormField(
                     decoration: InputDecoration(
@@ -211,6 +211,7 @@ class Articles extends StatelessWidget {
                         size: 25,
                       ),
                     ),
+                    //Affectation du controleur
                     controller: QuantiteArticleController),
                 TextFormField(
                     decoration: InputDecoration(
@@ -233,12 +234,14 @@ class Articles extends StatelessWidget {
                         size: 25,
                       ),
                     ),
+                    //Affectation du controleur
                     controller: DateController),
                 ElevatedButton(
                   child: Text(
                     'Enregistrer',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
+                  //Ajout des données la collection Articles
                   onPressed: () {
                     FirebaseFirestore.instance.collection('Articles').add({
                       'Identifiant': IdArticleController.value.text,
@@ -249,6 +252,7 @@ class Articles extends StatelessWidget {
                       'Prix Article': PrixUnitaireController.value.text,
                       'Date': DateController.value.text,
                     });
+                    //Sortie du formulaire après l'evnoi des données
                     Navigator.pop(context);
                   },
                 ),
@@ -259,6 +263,7 @@ class Articles extends StatelessWidget {
   }
 }
 
+//Classe MyHomePage
 class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -268,10 +273,12 @@ class MyHomePage extends StatelessWidget {
           backgroundColor: Colors.lightGreen,
           title: Text("Acceuil"),
         ),
+        //Vue en Layout(Grid)
         body: GridView.count(
           mainAxisSpacing: 5.0,
           crossAxisSpacing: 5.0,
           crossAxisCount: 2,
+          //Interface graphique
           children: <Widget>[
             Column(children: <Widget>[
               const Text('Articles'),
@@ -281,7 +288,7 @@ class MyHomePage extends StatelessWidget {
                 splashColor: Colors.blueGrey,
                 iconSize: 80,
                 onPressed: () {
-                  // Code à exécuter lorsque le bouton est pressé
+                  // Widget de sortie Articles()
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => Articles()),
@@ -297,11 +304,11 @@ class MyHomePage extends StatelessWidget {
                 splashColor: Colors.blueGrey,
                 iconSize: 80,
                 onPressed: () {
-                  // Code à exécuter lorsque le bouton est pressé
+                  //Widget de sortie Stock()
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => Stock()),
-                    //builder: (context) => Articles()),
+                    // builder: (context) => Recuperer()),
                   );
                 },
               )
@@ -314,7 +321,7 @@ class MyHomePage extends StatelessWidget {
                 splashColor: Colors.blueGrey,
                 iconSize: 80,
                 onPressed: () {
-                  // Code à exécuter lorsque le bouton est pressé
+                  //Widget de sortie Vente()
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => Parametres()),
@@ -332,7 +339,7 @@ class MyHomePage extends StatelessWidget {
                 splashColor: Colors.blueGrey,
                 iconSize: 80,
                 onPressed: () {
-                  // Code à exécuter lorsque le bouton est pressé
+                  //Widget de sortie Articles()
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => Articles()),
@@ -348,7 +355,7 @@ class MyHomePage extends StatelessWidget {
                 splashColor: Colors.blueGrey,
                 iconSize: 80,
                 onPressed: () {
-                  // Code à exécuter lorsque le bouton est pressé
+                  //Widget de sortie Parametres()
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => Parametres()),
@@ -366,7 +373,7 @@ class MyHomePage extends StatelessWidget {
                 splashColor: Colors.blueGrey,
                 iconSize: 80,
                 onPressed: () {
-                  // Code à exécuter lorsque le bouton est pressé
+                  //Widget de sortie Apropos()
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => Apropos()),
@@ -379,6 +386,7 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
+//Classe Parametres
 class Parametres extends StatelessWidget {
   const Parametres({Key? key}) : super(key: key);
 
@@ -386,6 +394,7 @@ class Parametres extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Paramètres")),
+      //Vue en mode liste
       body: ListView(
         children: <Widget>[
           ListTile(
@@ -396,6 +405,7 @@ class Parametres extends StatelessWidget {
               onPressed: () => print('select'),
             ),
           ),
+          //Liste des composants de paramètres
           ListTile(
             title: Text("Thèmes"),
             contentPadding: EdgeInsets.zero,
@@ -435,6 +445,7 @@ class Parametres extends StatelessWidget {
   }
 }
 
+//Widget Apropos
 class Apropos extends StatelessWidget {
   const Apropos({Key? key}) : super(key: key);
 
@@ -442,6 +453,7 @@ class Apropos extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Description")),
+      //Vue en mode liste
       body: ListView(
         children: <Widget>[
           ListTile(
@@ -466,6 +478,7 @@ class Apropos extends StatelessWidget {
   }
 }
 
+//Classe Ecran
 class Ecran1 extends StatelessWidget {
   final String title1, value;
   const Ecran1({Key? key, required this.title1, required this.value})
@@ -490,6 +503,7 @@ class Ecran1 extends StatelessWidget {
     );
   }
 }
+
 /*
 //COMPTEUR//
 
@@ -551,18 +565,26 @@ Future<int> getCount(DocumentReference ref) async {
   return totalCount;
 }
 */
-
+//Widget Stock
 class Stock extends StatefulWidget {
   const Stock({Key? key}) : super(key: key);
   @override
   RetourStockState createState() => RetourStockState();
 }
 
+//Widget de recuperation deStock
 class RetourStockState extends State<Stock> {
   final Stream<QuerySnapshot> Afficher =
       FirebaseFirestore.instance.collection('Articles').snapshots();
   @override
   Widget build(BuildContext context) {
+    final List<Articles> list = [];
+
+    getArticles() async {
+      final snapshot =
+          await FirebaseFirestore.instance.collection('Articles').get();
+    }
+
     return StreamBuilder<QuerySnapshot>(
       stream: Afficher,
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -594,7 +616,7 @@ class RetourStockState extends State<Stock> {
                             value['IdArticle'].toString(),
                             style: const TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
-                          ), /*
+                          ),
                           Text(
                             value['Nom'].toString(),
                             style: const TextStyle(
@@ -624,7 +646,7 @@ class RetourStockState extends State<Stock> {
                             value['Date'].toString(),
                             style: const TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
-                          ),*/
+                          ),
                         ],
                       ),
                     ),
@@ -638,3 +660,144 @@ class RetourStockState extends State<Stock> {
     );
   }
 }
+/*
+class Recuperer extends StatefulWidget {
+  const Recuperer({Key? key}) : super(key: key);
+  @override
+  RetourRecupererState createState() => RetourRecupererState();
+}
+
+class RetourRecupererState extends State<Recuperer> {
+  final Stream<QuerySnapshot> Afficher =
+      FirebaseFirestore.instance.collection('Articles').snapshots();
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: Afficher,
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          print('myString');
+          return CircularProgressIndicator();
+        }
+
+        return Column(
+          children: [
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: DataTable(
+                  columns: const <DataColumn>[
+                    DataColumn(
+                        label: Text('Name',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ))),
+                    DataColumn(
+                        label: Text('Age',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ))),
+                    DataColumn(
+                        label: Text('Gender',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ))),
+                    DataColumn(
+                        label: Text('Birthday',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ))),
+                    DataColumn(
+                        label: Text('Phone Number',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ))),
+                    DataColumn(
+                        label: Text('Triage Result',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ))),
+                    DataColumn(
+                        label: Text('Full Information',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ))),
+                  ],
+                  rows: snapshot.data!.docs.map((DocumentSnapshot doc) {
+                    final rowData = doc.data() as Map<String, dynamic>;
+
+                    // Return the corresponding string based on the value of "Triage Result"
+                    String triageResult = rowData['triage_result'].toString();
+                    List<String> listSymptoms =
+                        List<String>.from(rowData['Symptoms']);
+
+                    if (rowData['triage_result'] == 'A') {
+                      triageResult = 'Emergency Case';
+                      //print(triageResult);
+                    } else if (rowData['triage_result'] == 'B') {
+                      triageResult = 'Priority Case';
+                    } else if (rowData['triage_result'] == 'C') {
+                      triageResult = 'Non-urgent Case';
+                    }
+
+                    // create view button widget
+                    final viewButton = Afficher(
+                        context, rowData, doc, triageResult, listSymptoms);
+
+                    return DataRow(cells: [
+                      DataCell(Center(child: Text(rowData['Name']))),
+                      DataCell(Center(child: Text(rowData['Age'].toString()))),
+                      DataCell(Center(child: Text(rowData['Sex']))),
+                      DataCell(Center(child: Text(rowData['Birthday']))),
+                      DataCell(Center(child: Text(rowData['Contact Number']))),
+                      DataCell(Center(child: Text(triageResult))),
+                      DataCell(Center(child: viewButton)),
+                    ]);
+                  }).toList(), //.sublist(0, numberOfRows),
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    setState(() {});
+                  },
+                  child: Text('5'),
+                ),
+                SizedBox(width: 10),
+                TextButton(
+                  onPressed: () {
+                    setState(() {});
+                  },
+                  child: Text('10'),
+                ),
+                SizedBox(width: 10),
+                TextButton(
+                  onPressed: () {
+                    setState(() {});
+                  },
+                  child: Text('All'),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+}*/
